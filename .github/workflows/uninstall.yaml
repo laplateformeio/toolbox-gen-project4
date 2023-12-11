@@ -1,0 +1,71 @@
+name: Close Pull Request
+
+# only trigger on pull request closed events
+on:
+  pull_request:
+    branches:
+      - 'master'
+      - 'main'
+    types: [ closed ]
+  workflow_call:
+    outputs:
+      repo_name:
+        description: "API URL"
+        value: ${{ jobs.get-repo-name.outputs.repo_name }}
+env:
+  IMAGE_BACK_NAME: starter-back
+  IMAGE_FRONT_NAME: starter-front
+jobs:
+  get-repo-name:
+    runs-on: ubuntu-latest
+    outputs:
+      repo_name: ${{ steps.get_name.outputs.repo_name }}
+    steps:
+        - name: get_name
+          id: get_name
+          run: |
+              echo "repo_name=$(basename ${{ github.repository }})" >> $GITHUB_OUTPUT
+        - name: print_name
+          run: |
+            echo "TOTO ${{ steps.get_name.outputs.repo_name }}"
+  close_job:
+    needs: get-repo-name
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_HEAD_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: Create kube config
+        run: |
+          mkdir -p $HOME/.kube/
+          echo "${{ secrets.IONOS_KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Install helm
+        run: |
+          curl -LO https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz
+          tar -zxvf helm-v3.8.0-linux-amd64.tar.gz
+          mv linux-amd64/helm /usr/local/bin/helm
+          helm version
+
+      - name: Install or Update Chart
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${{ needs.get-repo-name.outputs.repo_name }}-back
+          VERSION=${{ steps.extract_branch.outputs.branch }}
+          VERSION=$(echo $VERSION | cut -c -20 | tr '[:upper:]' '[:lower:]' | sed 's/-$//')
+          helm uninstall ${{ needs.get-repo-name.outputs.repo_name }}-back-$VERSION
+
+      - name: Install or Update Chart
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${{ needs.get-repo-name.outputs.repo_name }}-front
+          VERSION=${{ steps.extract_branch.outputs.branch }}
+          VERSION=$(echo $VERSION | cut -c -20 | tr '[:upper:]' '[:lower:]' | sed 's/-$//')
+          helm uninstall ${{ needs.get-repo-name.outputs.repo_name }}-front-$VERSION

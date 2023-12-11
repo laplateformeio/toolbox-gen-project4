@@ -1,0 +1,56 @@
+name: Main Workflow
+on:
+  push:
+    branches:
+      - production
+  workflow_call:
+    outputs:
+      repo_name:
+        description: "API URL"
+        value: ${{ jobs.get-repo-name.outputs.repo_name }}
+jobs:
+  get-repo-name:
+    runs-on: ubuntu-latest
+    outputs:
+      repo_name: ${{ steps.get_name.outputs.repo_name }}
+    steps:
+        - name: get_name
+          id: get_name
+          run: |
+              echo "repo_name=$(basename ${{ github.repository }})" >> $GITHUB_OUTPUT
+        - name: print_name
+          run: |
+            echo "TOTO ${{ steps.get_name.outputs.repo_name }}"
+
+  run-build-job-back:
+    uses: laplateformeio/atelier-workflows/.github/workflows/workflow-back.yaml@main
+    needs: get-repo-name
+    with:
+      BUILD_FOLDER: ./back
+      IMAGE_NAME: ${{ needs.get-repo-name.outputs.repo_name }}-back
+      PROJECT_DB: ${{ needs.get-repo-name.outputs.repo_name }}
+      PROJECT_BUCKET: ${{ needs.get-repo-name.outputs.repo_name }}
+      NAMESPACE: 'c-laplateforme-prod'
+      DOMAIN: 'production.atelier.ovh'
+    secrets:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+      BLACKSWIFT_KUBE_CONFIG: ${{ secrets.BLACKSWIFT_KUBE_CONFIG }}
+  run-build-job-front:
+    uses: laplateformeio/atelier-workflows/.github/workflows/workflow-front.yaml@main
+    needs: [get-repo-name, run-build-job-back]
+    with:
+      BUILD_FOLDER: ./front
+      IMAGE_NAME: ${{ needs.get-repo-name.outputs.repo_name }}-front
+      API_URL: https://${{ needs.run-build-job-back.outputs.output_api_url }}
+      NAMESPACE: 'c-laplateforme-prod'
+      DOMAIN: 'production.atelier.ovh'
+    secrets:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+      BLACKSWIFT_KUBE_CONFIG: ${{ secrets.BLACKSWIFT_KUBE_CONFIG }}
+  run-build-job-notif:
+    uses: laplateformeio/atelier-workflows/.github/workflows/workflow-notification-chat.yaml@main
+    needs: [run-build-job-back, run-build-job-front]
+    with:
+      FRONT_URL: ${{ needs.run-build-job-front.outputs.output_front_url }}
+      API_URL: ${{ needs.run-build-job-back.outputs.output_api_url }}
+      CHAT_WEBHOOK: https://chat.googleapis.com/v1/spaces/AAAA8O2Mmwo/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=GmCyFbLHoBlwMgFynO008fEdnQclWgtE3U-cG1Qlpvg%3D
