@@ -20,39 +20,39 @@ vault {
 }
 
 env_template "ADMIN_JWT_SECRET" {
-  contents             = "{{ with secret \"dev-env/data/starter-back\" }}{{ .Data.data.ADMIN_JWT_SECRET }}{{ end }}"
+  contents             = "{{ with secret \"dev-env/data/toolbox-gen-project4\" }}{{ .Data.data.ADMIN_JWT_SECRET }}{{ end }}"
   error_on_missing_key = true
 }
 env_template "API_TOKEN_SALT" {
-  contents             = "{{ with secret \"dev-env/data/starter-back\" }}{{ .Data.data.API_TOKEN_SALT }}{{ end }}"
+  contents             = "{{ with secret \"dev-env/data/toolbox-gen-project4\" }}{{ .Data.data.API_TOKEN_SALT }}{{ end }}"
   error_on_missing_key = true
 }
 env_template "APP_KEYS" {
-  contents             = "{{ with secret \"dev-env/data/starter-back\" }}{{ .Data.data.APP_KEYS }}{{ end }}"
+  contents             = "{{ with secret \"dev-env/data/toolbox-gen-project4\" }}{{ .Data.data.APP_KEYS }}{{ end }}"
   error_on_missing_key = true
 }
 env_template "DATABASE_HOST" {
-  contents             = "{{ with secret \"dev-env/data/starter-back\" }}{{ .Data.data.DATABASE_HOST }}{{ end }}"
+  contents             = "{{ with secret \"dev-env/data/toolbox-gen-project4\" }}{{ .Data.data.DATABASE_HOST }}{{ end }}"
   error_on_missing_key = true
 }
 env_template "DATABASE_NAME" {
-  contents             = "{{ with secret \"dev-env/data/starter-back\" }}{{ .Data.data.DATABASE_NAME }}{{ end }}"
+  contents             = "{{ with secret \"dev-env/data/toolbox-gen-project4\" }}{{ .Data.data.DATABASE_NAME }}{{ end }}"
   error_on_missing_key = true
 }
 env_template "DATABASE_PORT" {
-  contents             = "{{ with secret \"dev-env/data/starter-back\" }}{{ .Data.data.DATABASE_PORT }}{{ end }}"
+  contents             = "{{ with secret \"dev-env/data/toolbox-gen-project4\" }}{{ .Data.data.DATABASE_PORT }}{{ end }}"
   error_on_missing_key = true
 }
 env_template "JWT_SECRET" {
-  contents             = "{{ with secret \"dev-env/data/starter-back\" }}{{ .Data.data.JWT_SECRET }}{{ end }}"
+  contents             = "{{ with secret \"dev-env/data/toolbox-gen-project4\" }}{{ .Data.data.JWT_SECRET }}{{ end }}"
   error_on_missing_key = true
 }
 env_template "MINIO_BUCKET" {
-  contents             = "{{ with secret \"dev-env/data/starter-back\" }}{{ .Data.data.MINIO_BUCKET }}{{ end }}"
+  contents             = "{{ with secret \"dev-env/data/toolbox-gen-project4\" }}{{ .Data.data.MINIO_BUCKET }}{{ end }}"
   error_on_missing_key = true
 }
 env_template "MINIO_FOLDER" {
-  contents             = "{{ with secret \"dev-env/data/starter-back\" }}{{ .Data.data.MINIO_FOLDER }}{{ end }}"
+  contents             = "{{ with secret \"dev-env/data/toolbox-gen-project4\" }}{{ .Data.data.MINIO_FOLDER }}{{ end }}"
   error_on_missing_key = true
 }
 env_template "DATABASE_PASSWORD" {
